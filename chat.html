@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Real-Time Chatroom</title>
+  <style>
+    /* Simple CSS for the chatroom */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+    #chat-box {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      padding: 8px;
+      margin: 5px 0;
+      background: #007acc;
+      color: white;
+      border-radius: 5px;
+    }
+    input[type="text"] {
+      padding: 10px;
+      width: 80%;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px;
+      width: 18%;
+      background-color: #007acc;
+      color: white;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div id="chat-box">
+    <ul id="messages"></ul>
+    <form id="chat-form">
+      <input id="message-input" type="text" autocomplete="off" placeholder="Type a message..." required />
+      <button type="submit">Send</button>
+    </form>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    // Connect to the Socket.io server
+    const socket = io();
+
+    // Listen for incoming messages
+    socket.on('chat message', (msg) => {
+      const li = document.createElement('li');
+      li.textContent = msg;
+      document.getElementById('messages').appendChild(li);
+    });
+
+    // Send message to server when the form is submitted
+    document.getElementById('chat-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const message = document.getElementById('message-input').value;
+      if (message) {
+        socket.emit('chat message', message);
+        document.getElementById('message-input').value = ''; // Clear input
+      }
+    });
+  </script>
+</body>
+</html>
