@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Real-Time Chatroom</title>
   <style>
-    /* Simple CSS for the chatroom */
     body {
       font-family: Arial, sans-serif;
       margin: 0;
@@ -46,32 +45,76 @@
       border: 1px solid #ddd;
       border-radius: 5px;
     }
+    #owner-panel {
+      margin-top: 20px;
+    }
+    .owner-input {
+      display: none;
+    }
   </style>
 </head>
 <body>
   <div id="chat-box">
     <h2>Chatroom</h2>
+    <div>
+      <label for="username">Change Username:</label>
+      <input type="text" id="username" placeholder="Enter new username" />
+      <button onclick="changeUsername()">Change Username</button>
+    </div>
     <ul id="messages"></ul>
     <form id="chat-form">
       <input id="message-input" type="text" autocomplete="off" placeholder="Type a message..." required />
       <button type="submit">Send</button>
     </form>
+
+    <div id="owner-panel">
+      <h3>Owner Panel</h3>
+      <input type="password" id="owner-password" placeholder="Enter owner password" />
+      <button onclick="showOwnerOptions()">Access Owner Panel</button>
+      <div id="owner-options" class="owner-input">
+        <input type="text" id="message-id" placeholder="Enter message ID to delete" />
+        <button onclick="deleteMessage()">Delete Message</button>
+      </div>
+    </div>
+
+    <br />
+    <button onclick="window.location.href='/index.html'">Back to Home</button>
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
-    // Connect to the Socket.io server
     const socket = io();
 
+    // Function to change username
+    function changeUsername() {
+      const username = document.getElementById('username').value;
+      if (username) {
+        socket.emit('change username', username);
+      }
+    }
+
     // Listen for incoming messages
-    socket.on('chat message', (msg) => {
+    socket.on('chat message', (msgData) => {
       const li = document.createElement('li');
-      li.textContent = msg;
+      li.id = msgData.id;
+      li.textContent = `${msgData.user}: ${msgData.msg}`;
       document.getElementById('messages').appendChild(li);
     });
 
-    // Send message to server when the form is submitted
-    document.getElementById('chat-form').addEventListener('submit', function(e) {
+    // Load previous messages when the page loads
+    socket.on('load messages', (msgs) => {
+      const messagesList = document.getElementById('messages');
+      messagesList.innerHTML = ''; // Clear existing messages
+      msgs.forEach((msgData) => {
+        const li = document.createElement('li');
+        li.id = msgData.id;
+        li.textContent = `${msgData.user}: ${msgData.msg}`;
+        messagesList.appendChild(li);
+      });
+    });
+
+    // Send message when the form is submitted
+    document.getElementById('chat-form').addEventListener('submit', function (e) {
       e.preventDefault();
       const message = document.getElementById('message-input').value;
       if (message) {
@@ -79,6 +122,26 @@
         document.getElementById('message-input').value = ''; // Clear input
       }
     });
+
+    // Function to show the owner options after correct password
+    function showOwnerOptions() {
+      const password = document.getElementById('owner-password').value;
+      if (password === 'owneriscool') {
+        document.getElementById('owner-options').style.display = 'block';
+      } else {
+        alert('Incorrect password');
+      }
+    }
+
+    // Function to delete a message as the owner
+    function deleteMessage() {
+      const messageId = document.getElementById('message-id').value;
+      const password = document.getElementById('owner-password').value;
+      if (messageId && password) {
+        socket.emit('delete message', messageId, password);
+        document.getElementById('message-id').value = ''; // Clear input
+      }
+    }
   </script>
 </body>
 </html>
