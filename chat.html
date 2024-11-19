@@ -4,25 +4,27 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SchoolNet Chat</title>
-    <link rel="stylesheet" href="./css/master.css" />
+    <link rel="stylesheet" href="./css/chat.css" />
   </head>
   <body>
-    <div class="container">
+    <div class="chat-container">
       <h1>Welcome to SchoolNet Chat</h1>
 
       <!-- Username input -->
       <input type="text" id="username" placeholder="Enter your username" />
 
-      <!-- Message display section -->
-      <div id="messages"></div>
+      <!-- Messages Display -->
+      <div id="messages-container">
+        <!-- Chat messages will show here -->
+      </div>
 
-      <!-- Input area to send messages -->
+      <!-- Message Input and Send Button -->
       <div id="input-container">
         <input type="text" id="message" placeholder="Type your message" />
         <button id="sendMessage">Send</button>
       </div>
 
-      <!-- Owner Panel -->
+      <!-- Owner Panel (hidden initially) -->
       <div id="ownerPanel" style="display: none">
         <h3>Owner Panel</h3>
         <input type="password" id="ownerPassword" placeholder="Enter password" />
@@ -37,27 +39,33 @@
     <script>
       const socket = io();
 
+      // Send message event
       document.getElementById('sendMessage').addEventListener('click', function (event) {
         event.preventDefault(); // Prevent page reload
 
-        const user = document.getElementById('username').value;
+        const username = document.getElementById('username').value;
         const message = document.getElementById('message').value;
 
-        if (user && message) {
-          socket.emit('chat message', { user: user, msg: message });
-          document.getElementById('message').value = ''; // Clear the input field
+        if (username && message) {
+          // Emit message to server
+          socket.emit('chat message', { user: username, msg: message });
+
+          // Clear the message input
+          document.getElementById('message').value = '';
         }
       });
 
-      // Listen for incoming chat messages from other users
+      // Listen for incoming messages
       socket.on('chat message', function (msgData) {
         const messageContainer = document.createElement('div');
         messageContainer.classList.add('message');
         messageContainer.innerHTML = `<strong>${msgData.user}:</strong> ${msgData.msg}`;
-        document.getElementById('messages').appendChild(messageContainer);
+        document.getElementById('messages-container').appendChild(messageContainer);
+        // Scroll to the bottom to show the latest message
+        document.getElementById('messages-container').scrollTop = document.getElementById('messages-container').scrollHeight;
       });
 
-      // Check for owner password and show owner panel
+      // Owner panel functionality (for owner password)
       document.getElementById('ownerPassword').addEventListener('input', function () {
         const password = document.getElementById('ownerPassword').value;
         if (password === 'owneriscool') {
@@ -67,10 +75,9 @@
         }
       });
 
-      // Delete message (for owner only)
+      // Message delete (for owner only)
       document.getElementById('deleteMessageBtn').addEventListener('click', function () {
-        // Logic to delete messages can be implemented here
-        alert('Message deleted! (Implement your logic)');
+        alert('Message deleted! (Implement message deletion logic here)');
       });
     </script>
   </body>
