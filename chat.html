@@ -9,108 +9,145 @@
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
-      background-color: #f1f1f1;
+      background-color: #000;
       color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      height: 100vh;
     }
-    #chat-box {
-      max-width: 800px;
-      margin: 20px auto;
-      padding: 20px;
-      background-color: #6a1b9a;
-      border-radius: 8px;
-      border: 1px solid #4a148c;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    }
-    h2 {
+
+    h2, h3 {
       text-align: center;
     }
+
+    #chat-box {
+      max-width: 900px;
+      width: 100%;
+      background-color: #222;
+      border-radius: 10px;
+      margin-top: 30px;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .input-box {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"], input[type="password"], #message-input {
+      padding: 10px;
+      width: 70%;
+      border-radius: 5px;
+      border: 1px solid #444;
+      margin-right: 10px;
+      background-color: #333;
+      color: #fff;
+    }
+
+    button {
+      padding: 10px;
+      width: 20%;
+      background-color: #8e24aa;
+      color: white;
+      border: 1px solid #444;
+      border-radius: 5px;
+    }
+
     #messages {
       max-height: 400px;
       overflow-y: auto;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
       padding: 10px;
-      background: #fff;
-      color: #000;
+      background-color: #444;
+      color: #fff;
       border-radius: 5px;
     }
+
     .message {
-      margin: 5px 0;
-      padding: 8px;
+      padding: 10px;
+      margin: 5px;
       background-color: #5e35b1;
       border-radius: 5px;
-      color: white;
+      word-wrap: break-word;
     }
+
     .message-owner {
       background-color: #1a237e;
     }
-    .owner-input {
-      display: none;
-    }
-    input[type="text"], input[type="password"] {
-      padding: 10px;
-      width: 80%;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      margin-bottom: 10px;
-    }
-    button {
-      padding: 10px;
-      width: 18%;
-      background-color: #8e24aa;
-      color: white;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-    }
+
     #owner-panel {
       margin-top: 20px;
       padding: 15px;
-      background-color: #4a148c;
+      background-color: #444;
       border-radius: 5px;
+      display: none;
     }
-    .input-box {
+
+    .owner-input {
       margin-bottom: 10px;
     }
+
     #back-home-btn {
-      display: block;
-      width: 100%;
       margin-top: 20px;
+      padding: 10px;
       background-color: #8e24aa;
+      color: white;
+      border-radius: 5px;
+      width: 20%;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .section {
+      margin-bottom: 30px;
     }
   </style>
 </head>
 <body>
+
+  <!-- Back Home Button -->
+  <div id="back-home-btn" onclick="window.location.href='/index.html'">Back to Home</div>
+
   <div id="chat-box">
-    <h2>Real-Time Chatroom</h2>
-
     <!-- Username change input -->
-    <div class="input-box">
-      <label for="username">Change Username:</label>
-      <input type="text" id="username" placeholder="Enter new username" />
-      <button onclick="changeUsername()">Change Username</button>
-    </div>
-
-    <!-- Display messages -->
-    <div id="messages"></div>
-
-    <!-- Message input -->
-    <form id="chat-form">
-      <input id="message-input" type="text" autocomplete="off" placeholder="Type a message..." required />
-      <button type="submit">Send</button>
-    </form>
-
-    <!-- Owner panel -->
-    <div id="owner-panel">
-      <h3>Owner Panel</h3>
-      <input type="password" id="owner-password" placeholder="Enter owner password" />
-      <button onclick="showOwnerOptions()">Access Owner Panel</button>
-      <div id="owner-options" class="owner-input">
-        <input type="text" id="message-id" placeholder="Enter message ID to delete" />
-        <button onclick="deleteMessage()">Delete Message</button>
+    <div class="section">
+      <h3>Change Username</h3>
+      <div class="input-box">
+        <input type="text" id="username" placeholder="Enter new username" />
+        <button onclick="changeUsername()">Change Username</button>
       </div>
     </div>
 
-    <!-- Back Home button -->
-    <button id="back-home-btn" onclick="window.location.href='/index.html'">Back to Home</button>
+    <!-- Messages Display -->
+    <div class="section">
+      <h3>Messages</h3>
+      <div id="messages"></div>
+    </div>
+
+    <!-- Message Input -->
+    <div class="section">
+      <form id="chat-form">
+        <input id="message-input" type="text" autocomplete="off" placeholder="Type a message..." required />
+        <button type="submit">Send</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Owner Panel -->
+  <div id="owner-panel">
+    <h3>Owner Panel</h3>
+    <div class="owner-input">
+      <input type="password" id="owner-password" placeholder="Enter owner password" />
+      <button onclick="showOwnerOptions()">Access Owner Panel</button>
+    </div>
+    <div id="owner-options" class="owner-input">
+      <input type="text" id="message-id" placeholder="Enter message ID to delete" />
+      <button onclick="deleteMessage()">Delete Message</button>
+    </div>
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
@@ -181,4 +218,3 @@
   </script>
 </body>
 </html>
-
