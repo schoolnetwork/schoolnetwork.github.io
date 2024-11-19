@@ -1,0 +1,136 @@
+/* General body styles */
+body {
+  background-color: black;
+  color: white;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Chat container */
+.chat-container {
+  width: 80%;
+  max-width: 800px;
+  background-color: #222;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+/* Heading */
+h1 {
+  color: #7c4dff; /* Purple color */
+  font-size: 36px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Messages Display Area */
+#messages-container {
+  width: 100%;
+  max-height: 400px;
+  overflow-y: auto;
+  background-color: #333;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+/* Message box */
+.message {
+  background-color: #444;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+strong {
+  color: #7c4dff;
+}
+
+/* Input and Send Message Button */
+#input-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+#message {
+  width: 80%;
+  padding: 10px;
+  border-radius: 25px;
+  border: 1px solid #7c4dff;
+  background-color: #222;
+  color: white;
+  font-size: 16px;
+  margin-right: 10px;
+}
+
+#sendMessage {
+  background-color: #7c4dff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#sendMessage:hover {
+  background-color: #5e33cc;
+}
+
+/* Owner Panel */
+#ownerPanel {
+  background-color: #444;
+  padding: 15px;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+#ownerPanel input {
+  padding: 10px;
+  border-radius: 25px;
+  border: 1px solid #7c4dff;
+  background-color: #222;
+  color: white;
+  font-size: 16px;
+}
+
+#ownerPanel button {
+  background-color: #ff5733;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#ownerPanel button:hover {
+  background-color: #c93c20;
+}
+
+/* Back Home Button */
+#backHome {
+  margin-top: 20px;
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#backHome:hover {
+  background-color: #388e3c;
+}
