@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="shortcut icon" href="./assets/images/icon.png" type="image/png" />
+    <title>SchoolNet</title>
+
+    <link rel="stylesheet" href="./css/master.css" />
+
+    <script src="/uv/uv.bundle.js" charset="UTF-8"></script>
+    <script src="/uv/uv.config.js"></script>
+    <script src="./js/preload.js"></script>
+
+    <script type="text/javascript">
+      atOptions = {
+        key: 'fc0ad22bd8c1ea22c8c08df927121e8f',
+        format: 'iframe',
+        height: 60,
+        width: 468,
+        params: {},
+      };
+    </script>
+    <style>
+      /* Additional styling for the login page */
+      #login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f4f4f9;
+        color: #333;
+        flex-direction: column;
+      }
+
+      #main-content {
+        display: none; /* Hide main content initially */
+      }
+
+      input[type="password"] {
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        margin-bottom: 10px;
+      }
+
+      .button {
+        padding: 10px 20px;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px;
+        background-color: #007acc;
+        color: white;
+        cursor: pointer;
+      }
+
+      .button:hover {
+        background-color: #005fa3;
+      }
+    </style>
+  </head>
+
+  <body theme="main">
+    <!-- Login Screen -->
+    <div id="login-container">
+      <h1>Welcome to SchoolNet</h1>
+      <p>Please enter the password to continue:</p>
+      <input type="password" id="password" placeholder="Enter password..." />
+      <button class="button" onclick="checkPassword()">Submit</button>
+      <p id="login-error" style="color: red; display: none;">Incorrect password!</p>
+    </div>
+
+    <!-- Main Content -->
+    <div id="main-content">
+      <nav>
+        <div class="logo">
+          <img src="./assets/images/icon.png" alt="Logo" draggable="false" />
+          <h1>SchoolNet</h1>
+        </div>
+
+        <p id="time"></p>
+
+        <div class="navitems">
+          <div class="navitem"><a selected href="/">Home</a></div>
+          <div class="navitem"><a href="/gs.html">Games</a></div>
+          <div class="navitem"><a href="/apps.html">Apps</a></div>
+          <div class="navitem"><a href="/emulator.html">Emulator</a></div>
+          <div class="navitem"><a href="/search.html">Search</a></div>
+        </div>
+      </nav>
+
+      <div class="center-container">
+        <h1>Welcome to <span>SchoolNet</span></h1>
+        <p id="splash"></p>
+        <br />
+        <button onclick="launchab()" id="launchab" class="button play">Launch in about:blank</button>
+        <br />
+        <div class="ad">
+          <script
+            async="async"
+            data-cfasync="false"
+            src="//strodeintended.com/4f6e85f4c635684096b4338b181d1962/invoke.js"
+          ></script>
+        </div>
+      </div>
+
+      <div class="links">
+        <div class="left">
+          <a href="https://selenite-dev.github.io/">GitHub</a>
+        </div>
+
+        <div class="right">
+          <a href="./settings.html">Settings</a>
+          <a href="./about.html">About</a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Password verification
+      function checkPassword() {
+        const passwordInput = document.getElementById("password").value;
+        const correctPassword = "schoolisgay";
+        const errorText = document.getElementById("login-error");
+
+        if (passwordInput === correctPassword) {
+          document.getElementById("login-container").style.display = "none"; // Hide login
+          document.getElementById("main-content").style.display = "block"; // Show main content
+        } else {
+          errorText.style.display = "block"; // Show error message
+        }
+      }
+
+      // Splash text fetch
+      fetch("./assets/data/splash.json")
+        .then((res) => res.json())
+        .then((data) => {
+          document.querySelector("#splash").innerHTML =
+            data[Math.floor(Math.random() * data.length)];
+        });
+    </script>
+
+    <script src="./js/index.js"></script>
+  </body>
+</html>
