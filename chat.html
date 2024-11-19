@@ -3,70 +3,102 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SchoolNet Chatroom</title>
+  <title>Real-Time Chatroom</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
-      background-color: #f4f4f4;
+      background-color: #f1f1f1;
+      color: #fff;
     }
     #chat-box {
-      max-width: 600px;
+      max-width: 800px;
       margin: 20px auto;
       padding: 20px;
-      background-color: white;
+      background-color: #6a1b9a;
+      border-radius: 8px;
+      border: 1px solid #4a148c;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+    h2 {
+      text-align: center;
+    }
+    #messages {
+      max-height: 400px;
+      overflow-y: auto;
+      margin-bottom: 15px;
+      padding: 10px;
+      background: #fff;
+      color: #000;
       border-radius: 5px;
-      border: 1px solid #ddd;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
-    ul {
-      list-style: none;
-      padding: 0;
-    }
-    li {
-      padding: 8px;
+    .message {
       margin: 5px 0;
-      background: #007acc;
-      color: white;
+      padding: 8px;
+      background-color: #5e35b1;
       border-radius: 5px;
+      color: white;
     }
-    input[type="text"] {
+    .message-owner {
+      background-color: #1a237e;
+    }
+    .owner-input {
+      display: none;
+    }
+    input[type="text"], input[type="password"] {
       padding: 10px;
       width: 80%;
       border: 1px solid #ddd;
       border-radius: 5px;
+      margin-bottom: 10px;
     }
     button {
       padding: 10px;
       width: 18%;
-      background-color: #007acc;
+      background-color: #8e24aa;
       color: white;
       border: 1px solid #ddd;
       border-radius: 5px;
     }
     #owner-panel {
       margin-top: 20px;
+      padding: 15px;
+      background-color: #4a148c;
+      border-radius: 5px;
     }
-    .owner-input {
-      display: none;
+    .input-box {
+      margin-bottom: 10px;
+    }
+    #back-home-btn {
+      display: block;
+      width: 100%;
+      margin-top: 20px;
+      background-color: #8e24aa;
     }
   </style>
 </head>
 <body>
   <div id="chat-box">
-    <h2>Chatroom</h2>
-    <div>
+    <h2>Real-Time Chatroom</h2>
+
+    <!-- Username change input -->
+    <div class="input-box">
       <label for="username">Change Username:</label>
       <input type="text" id="username" placeholder="Enter new username" />
       <button onclick="changeUsername()">Change Username</button>
     </div>
-    <ul id="messages"></ul>
+
+    <!-- Display messages -->
+    <div id="messages"></div>
+
+    <!-- Message input -->
     <form id="chat-form">
       <input id="message-input" type="text" autocomplete="off" placeholder="Type a message..." required />
       <button type="submit">Send</button>
     </form>
 
+    <!-- Owner panel -->
     <div id="owner-panel">
       <h3>Owner Panel</h3>
       <input type="password" id="owner-password" placeholder="Enter owner password" />
@@ -77,8 +109,8 @@
       </div>
     </div>
 
-    <br />
-    <button onclick="window.location.href='/index.html'">Back to Home</button>
+    <!-- Back Home button -->
+    <button id="back-home-btn" onclick="window.location.href='/index.html'">Back to Home</button>
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
@@ -95,25 +127,29 @@
 
     // Listen for incoming messages
     socket.on('chat message', (msgData) => {
-      const li = document.createElement('li');
-      li.id = msgData.id;
-      li.textContent = `${msgData.user}: ${msgData.msg}`;
-      document.getElementById('messages').appendChild(li);
+      const messageContainer = document.createElement('div');
+      messageContainer.classList.add('message');
+      messageContainer.id = msgData.id;
+      messageContainer.innerHTML = `<strong>${msgData.user}:</strong> ${msgData.msg}`;
+
+      document.getElementById('messages').appendChild(messageContainer);
     });
 
-    // Load previous messages when the page loads
+    // Load all messages when the page is loaded
     socket.on('load messages', (msgs) => {
       const messagesList = document.getElementById('messages');
       messagesList.innerHTML = ''; // Clear existing messages
       msgs.forEach((msgData) => {
-        const li = document.createElement('li');
-        li.id = msgData.id;
-        li.textContent = `${msgData.user}: ${msgData.msg}`;
-        messagesList.appendChild(li);
+        const messageContainer = document.createElement('div');
+        messageContainer.classList.add('message');
+        messageContainer.id = msgData.id;
+        messageContainer.innerHTML = `<strong>${msgData.user}:</strong> ${msgData.msg}`;
+
+        messagesList.appendChild(messageContainer);
       });
     });
 
-    // Send message when the form is submitted
+    // Prevent page reload when sending a message
     document.getElementById('chat-form').addEventListener('submit', function (e) {
       e.preventDefault();
       const message = document.getElementById('message-input').value;
@@ -123,7 +159,7 @@
       }
     });
 
-    // Function to show the owner options after correct password
+    // Show owner options after correct password
     function showOwnerOptions() {
       const password = document.getElementById('owner-password').value;
       if (password === 'owneriscool') {
@@ -133,11 +169,11 @@
       }
     }
 
-    // Function to delete a message as the owner
+    // Delete message as the owner
     function deleteMessage() {
       const messageId = document.getElementById('message-id').value;
       const password = document.getElementById('owner-password').value;
-      if (messageId && password) {
+      if (messageId && password === 'owneriscool') {
         socket.emit('delete message', messageId, password);
         document.getElementById('message-id').value = ''; // Clear input
       }
@@ -145,3 +181,4 @@
   </script>
 </body>
 </html>
+
