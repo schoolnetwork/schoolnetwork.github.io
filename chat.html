@@ -1,220 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Real-Time Chatroom</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #000;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      height: 100vh;
-    }
-
-    h2, h3 {
-      text-align: center;
-    }
-
-    #chat-box {
-      max-width: 900px;
-      width: 100%;
-      background-color: #222;
-      border-radius: 10px;
-      margin-top: 30px;
-      padding: 20px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    }
-
-    .input-box {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
-
-    input[type="text"], input[type="password"], #message-input {
-      padding: 10px;
-      width: 70%;
-      border-radius: 5px;
-      border: 1px solid #444;
-      margin-right: 10px;
-      background-color: #333;
-      color: #fff;
-    }
-
-    button {
-      padding: 10px;
-      width: 20%;
-      background-color: #8e24aa;
-      color: white;
-      border: 1px solid #444;
-      border-radius: 5px;
-    }
-
-    #messages {
-      max-height: 400px;
-      overflow-y: auto;
-      margin-bottom: 20px;
-      padding: 10px;
-      background-color: #444;
-      color: #fff;
-      border-radius: 5px;
-    }
-
-    .message {
-      padding: 10px;
-      margin: 5px;
-      background-color: #5e35b1;
-      border-radius: 5px;
-      word-wrap: break-word;
-    }
-
-    .message-owner {
-      background-color: #1a237e;
-    }
-
-    #owner-panel {
-      margin-top: 20px;
-      padding: 15px;
-      background-color: #444;
-      border-radius: 5px;
-      display: none;
-    }
-
-    .owner-input {
-      margin-bottom: 10px;
-    }
-
-    #back-home-btn {
-      margin-top: 20px;
-      padding: 10px;
-      background-color: #8e24aa;
-      color: white;
-      border-radius: 5px;
-      width: 20%;
-      text-align: center;
-      cursor: pointer;
-    }
-
-    .section {
-      margin-bottom: 30px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SchoolNet Chat</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <script src="/socket.io/socket.io.js"></script>
 </head>
-<body>
 
-  <!-- Back Home Button -->
-  <div id="back-home-btn" onclick="window.location.href='/index.html'">Back to Home</div>
+<body style="background-color: black; color: white;">
 
-  <div id="chat-box">
-    <!-- Username change input -->
-    <div class="section">
-      <h3>Change Username</h3>
-      <div class="input-box">
-        <input type="text" id="username" placeholder="Enter new username" />
-        <button onclick="changeUsername()">Change Username</button>
-      </div>
+    <!-- Header with Username Change -->
+    <div id="username-section" style="text-align: center; padding: 20px;">
+        <h2>Welcome to the Chat</h2>
+        <div>
+            <label for="username">Change Username: </label>
+            <input type="text" id="username" placeholder="Enter your username">
+            <button id="change-username-btn" onclick="changeUsername()">Change Username</button>
+        </div>
     </div>
 
-    <!-- Messages Display -->
-    <div class="section">
-      <h3>Messages</h3>
-      <div id="messages"></div>
+    <!-- Message Section -->
+    <div id="message-section" style="text-align: center; padding: 20px;">
+        <h3>Chat Room</h3>
+        <div id="messages" style="height: 300px; overflow-y: scroll; border: 1px solid #fff; padding: 10px;">
+            <!-- Messages will appear here -->
+        </div>
+        <div>
+            <textarea id="message-input" placeholder="Type a message..." style="width: 300px; height: 50px;"></textarea>
+            <button onclick="sendMessage()">Send</button>
+        </div>
     </div>
 
-    <!-- Message Input -->
-    <div class="section">
-      <form id="chat-form">
-        <input id="message-input" type="text" autocomplete="off" placeholder="Type a message..." required />
-        <button type="submit">Send</button>
-      </form>
+    <!-- Owner Panel (Password Protected) -->
+    <div id="owner-panel" style="text-align: center; padding: 20px; display: none;">
+        <h3>Owner Panel</h3>
+        <input type="text" id="owner-password" placeholder="Enter Owner Password">
+        <button onclick="loginOwner()">Log in</button>
+        <div id="delete-section" style="margin-top: 20px; display: none;">
+            <h4>Delete a Message</h4>
+            <input type="text" id="message-id" placeholder="Enter Message ID">
+            <button onclick="deleteMessage()">Delete Message</button>
+        </div>
     </div>
-  </div>
 
-  <!-- Owner Panel -->
-  <div id="owner-panel">
-    <h3>Owner Panel</h3>
-    <div class="owner-input">
-      <input type="password" id="owner-password" placeholder="Enter owner password" />
-      <button onclick="showOwnerOptions()">Access Owner Panel</button>
+    <!-- Back to Home Button -->
+    <div style="text-align: center; padding: 20px;">
+        <button onclick="window.location.href='/index.html'">Back to Home</button>
     </div>
-    <div id="owner-options" class="owner-input">
-      <input type="text" id="message-id" placeholder="Enter message ID to delete" />
-      <button onclick="deleteMessage()">Delete Message</button>
-    </div>
-  </div>
 
-  <script src="/socket.io/socket.io.js"></script>
-  <script>
-    const socket = io();
+    <script>
+        const socket = io();
+        let username = "Guest"; // Default username
 
-    // Function to change username
-    function changeUsername() {
-      const username = document.getElementById('username').value;
-      if (username) {
-        socket.emit('change username', username);
-      }
-    }
+        // Change Username function
+        function changeUsername() {
+            const newUsername = document.getElementById("username").value;
+            if (newUsername) {
+                username = newUsername;
+                alert(`Username changed to ${username}`);
+            }
+        }
 
-    // Listen for incoming messages
-    socket.on('chat message', (msgData) => {
-      const messageContainer = document.createElement('div');
-      messageContainer.classList.add('message');
-      messageContainer.id = msgData.id;
-      messageContainer.innerHTML = `<strong>${msgData.user}:</strong> ${msgData.msg}`;
+        // Send message to server
+        function sendMessage() {
+            const message = document.getElementById("message-input").value;
+            if (message.trim()) {
+                socket.emit('chat message', { user: username, msg: message });
+                document.getElementById("message-input").value = '';  // Clear input
+            }
+        }
 
-      document.getElementById('messages').appendChild(messageContainer);
-    });
+        // Listen for incoming messages
+        socket.on('chat message', (msgData) => {
+            const messageContainer = document.createElement('div');
+            messageContainer.classList.add('message');
+            messageContainer.id = msgData.id;  // Set unique ID to the message div
+            messageContainer.innerHTML = `<strong>${msgData.user}:</strong> ${msgData.msg}`;
+            document.getElementById('messages').appendChild(messageContainer);
+        });
 
-    // Load all messages when the page is loaded
-    socket.on('load messages', (msgs) => {
-      const messagesList = document.getElementById('messages');
-      messagesList.innerHTML = ''; // Clear existing messages
-      msgs.forEach((msgData) => {
-        const messageContainer = document.createElement('div');
-        messageContainer.classList.add('message');
-        messageContainer.id = msgData.id;
-        messageContainer.innerHTML = `<strong>${msgData.user}:</strong> ${msgData.msg}`;
+        // Listen for deleted messages
+        socket.on('delete message', (messageId) => {
+            const messageElement = document.getElementById(messageId);
+            if (messageElement) {
+                messageElement.remove();
+            }
+        });
 
-        messagesList.appendChild(messageContainer);
-      });
-    });
+        // Owner login to access message deletion
+        function loginOwner() {
+            const password = document.getElementById("owner-password").value;
+            if (password === "owneriscool") {
+                document.getElementById("owner-panel").style.display = "block";
+                document.getElementById("delete-section").style.display = "block";
+            } else {
+                alert("Incorrect password");
+            }
+        }
 
-    // Prevent page reload when sending a message
-    document.getElementById('chat-form').addEventListener('submit', function (e) {
-      e.preventDefault();
-      const message = document.getElementById('message-input').value;
-      if (message) {
-        socket.emit('chat message', message);
-        document.getElementById('message-input').value = ''; // Clear input
-      }
-    });
+        // Delete a message by its ID
+        function deleteMessage() {
+            const messageId = document.getElementById("message-id").value;
+            if (messageId) {
+                socket.emit('delete message', messageId, document.getElementById("owner-password").value);
+                document.getElementById("message-id").value = '';  // Clear input
+            }
+        }
 
-    // Show owner options after correct password
-    function showOwnerOptions() {
-      const password = document.getElementById('owner-password').value;
-      if (password === 'owneriscool') {
-        document.getElementById('owner-options').style.display = 'block';
-      } else {
-        alert('Incorrect password');
-      }
-    }
-
-    // Delete message as the owner
-    function deleteMessage() {
-      const messageId = document.getElementById('message-id').value;
-      const password = document.getElementById('owner-password').value;
-      if (messageId && password === 'owneriscool') {
-        socket.emit('delete message', messageId, password);
-        document.getElementById('message-id').value = ''; // Clear input
-      }
-    }
-  </script>
+        // Server-side connection for socket.io
+        socket.on('connect', () => {
+            console.log("Connected to server");
+        });
+    </script>
 </body>
+
 </html>
