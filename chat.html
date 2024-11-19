@@ -1,119 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SchoolNet Chat</title>
-    <link rel="stylesheet" href="./css/style.css">
-    <script src="/socket.io/socket.io.js"></script>
-</head>
+    <link rel="stylesheet" href="./css/master.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Welcome to SchoolNet Chat</h1>
 
-<body style="background-color: black; color: white;">
+      <!-- Username input -->
+      <input type="text" id="username" placeholder="Enter your username" />
 
-    <!-- Header with Username Change -->
-    <div id="username-section" style="text-align: center; padding: 20px;">
-        <h2>Welcome to the Chat</h2>
-        <div>
-            <label for="username">Change Username: </label>
-            <input type="text" id="username" placeholder="Enter your username">
-            <button id="change-username-btn" onclick="changeUsername()">Change Username</button>
-        </div>
-    </div>
+      <!-- Message display section -->
+      <div id="messages"></div>
 
-    <!-- Message Section -->
-    <div id="message-section" style="text-align: center; padding: 20px;">
-        <h3>Chat Room</h3>
-        <div id="messages" style="height: 300px; overflow-y: scroll; border: 1px solid #fff; padding: 10px;">
-            <!-- Messages will appear here -->
-        </div>
-        <div>
-            <textarea id="message-input" placeholder="Type a message..." style="width: 300px; height: 50px;"></textarea>
-            <button onclick="sendMessage()">Send</button>
-        </div>
-    </div>
+      <!-- Input area to send messages -->
+      <div id="input-container">
+        <input type="text" id="message" placeholder="Type your message" />
+        <button id="sendMessage">Send</button>
+      </div>
 
-    <!-- Owner Panel (Password Protected) -->
-    <div id="owner-panel" style="text-align: center; padding: 20px; display: none;">
+      <!-- Owner Panel -->
+      <div id="ownerPanel" style="display: none">
         <h3>Owner Panel</h3>
-        <input type="text" id="owner-password" placeholder="Enter Owner Password">
-        <button onclick="loginOwner()">Log in</button>
-        <div id="delete-section" style="margin-top: 20px; display: none;">
-            <h4>Delete a Message</h4>
-            <input type="text" id="message-id" placeholder="Enter Message ID">
-            <button onclick="deleteMessage()">Delete Message</button>
-        </div>
+        <input type="password" id="ownerPassword" placeholder="Enter password" />
+        <button id="deleteMessageBtn">Delete Message</button>
+      </div>
+
+      <!-- Back to Home Button -->
+      <button id="backHome" onclick="window.location.href='/index.html'">Back Home</button>
     </div>
 
-    <!-- Back to Home Button -->
-    <div style="text-align: center; padding: 20px;">
-        <button onclick="window.location.href='/index.html'">Back to Home</button>
-    </div>
-
+    <script src="/socket.io/socket.io.js"></script>
     <script>
-        const socket = io();
-        let username = "Guest"; // Default username
+      const socket = io();
 
-        // Change Username function
-        function changeUsername() {
-            const newUsername = document.getElementById("username").value;
-            if (newUsername) {
-                username = newUsername;
-                alert(`Username changed to ${username}`);
-            }
+      document.getElementById('sendMessage').addEventListener('click', function (event) {
+        event.preventDefault(); // Prevent page reload
+
+        const user = document.getElementById('username').value;
+        const message = document.getElementById('message').value;
+
+        if (user && message) {
+          socket.emit('chat message', { user: user, msg: message });
+          document.getElementById('message').value = ''; // Clear the input field
         }
+      });
 
-        // Send message to server
-        function sendMessage() {
-            const message = document.getElementById("message-input").value;
-            if (message.trim()) {
-                socket.emit('chat message', { user: username, msg: message });
-                document.getElementById("message-input").value = '';  // Clear input
-            }
+      // Listen for incoming chat messages from other users
+      socket.on('chat message', function (msgData) {
+        const messageContainer = document.createElement('div');
+        messageContainer.classList.add('message');
+        messageContainer.innerHTML = `<strong>${msgData.user}:</strong> ${msgData.msg}`;
+        document.getElementById('messages').appendChild(messageContainer);
+      });
+
+      // Check for owner password and show owner panel
+      document.getElementById('ownerPassword').addEventListener('input', function () {
+        const password = document.getElementById('ownerPassword').value;
+        if (password === 'owneriscool') {
+          document.getElementById('ownerPanel').style.display = 'block';
+        } else {
+          document.getElementById('ownerPanel').style.display = 'none';
         }
+      });
 
-        // Listen for incoming messages
-        socket.on('chat message', (msgData) => {
-            const messageContainer = document.createElement('div');
-            messageContainer.classList.add('message');
-            messageContainer.id = msgData.id;  // Set unique ID to the message div
-            messageContainer.innerHTML = `<strong>${msgData.user}:</strong> ${msgData.msg}`;
-            document.getElementById('messages').appendChild(messageContainer);
-        });
-
-        // Listen for deleted messages
-        socket.on('delete message', (messageId) => {
-            const messageElement = document.getElementById(messageId);
-            if (messageElement) {
-                messageElement.remove();
-            }
-        });
-
-        // Owner login to access message deletion
-        function loginOwner() {
-            const password = document.getElementById("owner-password").value;
-            if (password === "owneriscool") {
-                document.getElementById("owner-panel").style.display = "block";
-                document.getElementById("delete-section").style.display = "block";
-            } else {
-                alert("Incorrect password");
-            }
-        }
-
-        // Delete a message by its ID
-        function deleteMessage() {
-            const messageId = document.getElementById("message-id").value;
-            if (messageId) {
-                socket.emit('delete message', messageId, document.getElementById("owner-password").value);
-                document.getElementById("message-id").value = '';  // Clear input
-            }
-        }
-
-        // Server-side connection for socket.io
-        socket.on('connect', () => {
-            console.log("Connected to server");
-        });
+      // Delete message (for owner only)
+      document.getElementById('deleteMessageBtn').addEventListener('click', function () {
+        // Logic to delete messages can be implemented here
+        alert('Message deleted! (Implement your logic)');
+      });
     </script>
-</body>
-
+  </body>
 </html>
