@@ -30,9 +30,13 @@ io.on('connection', (socket) => {
   // Event to receive chat message and broadcast to all clients
   socket.on('chat message', (msg) => {
     const username = users[socket.id] || 'Anonymous';
-    const messageData = { user: username, msg: msg, id: socket.id };
+    const messageData = {
+      user: username,
+      msg: msg,
+      id: socket.id + Date.now() // Unique ID based on socket ID and timestamp
+    };
     messages.push(messageData);
-    io.emit('chat message', messageData);
+    io.emit('chat message', messageData); // Broadcast message to everyone
   });
 
   // Event to delete a message (for the owner only)
